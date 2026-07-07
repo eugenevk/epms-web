@@ -1,28 +1,28 @@
-# Migratieplan qepms → epms-web
+# Migration plan qepms → epms-web
 
-## Strategie
+## Strategy
 
-- **Zelfde Firebase-project** (`epms-fa759`) en bestaande data
-- **qepms** (Quasar) blijft productie tot feature-parity
-- **epms-web** is frontend-only; deploy van rules/functions blijft in `qepms`
+- **Same Firebase project** (`epms-fa759`) and existing data
+- **qepms** (Quasar) stays in production until feature parity
+- **epms-web** is frontend-only; deploy of rules/functions remains in `qepms`
 
-## Fasen
+## Phases
 
-### Fase 1 — Scaffold (huidig)
+### Phase 1 — Scaffold (current)
 
 - Vue 3 + Vite + TypeScript + Tailwind + Pinia
 - Firebase Auth (login, auto-logout 15 min)
-- Basis layout + dashboard placeholder
+- Basic layout + dashboard placeholder
 
-### Fase 2 — Companies
+### Phase 2 — Companies
 
-- Lijstpagina (Firestore of Algolia)
+- List page (Firestore or Algolia)
 - Detail/create/edit
-- Eerste `src/lib/companies.ts` domeinmodule
+- First `src/lib/companies.ts` domain module
 
-### Fase 3 — Overige entiteiten
+### Phase 3 — Other entities
 
-Volgorde voorstel:
+Suggested order:
 
 1. Contacts
 2. Opportunities (+ stages)
@@ -30,22 +30,22 @@ Volgorde voorstel:
 4. RFP's (+ milestones, questions)
 5. Tasks + Notes
 
-### Fase 4 — Zoeken & admin
+### Phase 4 — Search & admin
 
-- Custom Algolia-laag (IDs → hydrate uit Firestore)
+- Custom Algolia layer (IDs → hydrate from Firestore)
 - Reference lists (`lists` + `items`)
 - Stages admin
 - Excel import
 
-## Dataconventies (behouden uit qepms)
+## Data conventions (kept from qepms)
 
-- `objectID`, `objectType`, `objectLabel` op zoekbare entiteiten
-- `{ id, objectLabel }` voor relaties
-- `linkedObject` voor tasks/notes
-- Auditvelden: `createdAt`, `createdBy`, `updatedAt`, `updatedBy`
+- `objectID`, `objectType`, `objectLabel` on searchable entities
+- `{ id, objectLabel }` for relations
+- `linkedObject` for tasks/notes
+- Audit fields: `createdAt`, `createdBy`, `updatedAt`, `updatedBy`
 
-## Backend-wijzigingen (later, in qepms-repo)
+## Backend changes (later, in qepms repo)
 
 - Firestore security rules
-- Algolia sync via `onWrite` triggers i.p.v. open REST proxy
-- Optioneel: rollen via custom claims
+- Algolia sync via Firestore `onWrite` triggers in `functions/index.js` (see epms-web `docs/ALGOLIA_SYNC.md`)
+- Optional: roles via custom claims

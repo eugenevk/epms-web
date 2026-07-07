@@ -1,17 +1,185 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  html {
+    font-family: 'Poppins', sans-serif;
+    @apply antialiased w-full max-w-full overflow-x-clip;
+  }
+
   body {
-    @apply min-h-screen font-sans;
+    @apply min-h-screen w-full max-w-full overflow-x-clip;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  #app {
+    @apply min-h-screen w-full max-w-full overflow-x-clip;
+  }
+
+  button,
+  input,
+  optgroup,
+  select,
+  textarea {
+    font-family: 'Poppins', sans-serif;
+  }
+
+  input:not([type='checkbox']):not([type='radio']),
+  select,
+  textarea {
+    font-weight: 400;
+  }
+
+  input[type='checkbox'] {
+    @apply h-6 w-6 shrink-0 cursor-pointer appearance-none rounded-lg border-2 border-stone-300 bg-white align-middle outline-none ring-2 ring-transparent transition-colors;
+    @apply focus:border-epms-600 focus:ring-epms-600/30;
+    @apply checked:border-epms-700 checked:bg-epms-700;
+    @apply disabled:cursor-not-allowed;
+  }
+
+  input[type='checkbox']:disabled:not(:checked) {
+    @apply border-stone-200 bg-stone-50 opacity-60;
+  }
+
+  input[type='checkbox']:disabled:checked {
+    @apply border-stone-500 bg-stone-500 opacity-100;
+  }
+
+  input[type='checkbox']:checked {
+    background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 0 1 0 1.414l-5 5a1 1 0 0 1-1.414 0l-2.5-2.5a1 1 0 0 1 1.414-1.414L6.5 9.086l4.293-4.293a1 1 0 0 1 1.414 0z'/%3e%3c/svg%3e");
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  label:has(> input[type='checkbox']) {
+    font-weight: 400;
+  }
+
+  label:has(> input[type='checkbox']:disabled:checked) {
+    @apply font-medium text-stone-700;
   }
 }
 
 @layer components {
   .field-focus {
-    @apply outline-none ring-2 ring-epms-600/30 focus:border-epms-600;
+    @apply outline-none border-[0.5px] border-stone-300 ring-2 ring-epms-600/30 focus:border-epms-600 font-normal;
+  }
+
+  .field-readonly {
+    @apply cursor-default border-[0.5px] border-stone-200 bg-stone-50 text-stone-600 outline-none font-normal;
+  }
+
+  .field-readonly:focus {
+    @apply border-stone-200 ring-0;
+  }
+
+  select.field-readonly:disabled {
+    appearance: none;
+  }
+
+  .rich-text-content {
+    @apply font-normal;
+  }
+
+  .rich-text-content :where(p, ul, ol, h1, h2, h3, h4, h5, h6) {
+    @apply mb-3 last:mb-0;
+  }
+
+  .rich-text-content :where(ul, ol) {
+    @apply ml-5;
+  }
+
+  .rich-text-content :where(ul) {
+    @apply list-disc;
+  }
+
+  .rich-text-content :where(ol) {
+    @apply list-decimal;
+  }
+
+  .rich-text-content :where(a) {
+    @apply text-epms-800 underline decoration-epms-300 underline-offset-2 hover:text-epms-950;
+  }
+
+  .rich-text-content :where(h1) {
+    @apply text-xl font-semibold text-stone-900;
+  }
+
+  .rich-text-content :where(h2) {
+    @apply text-lg font-semibold text-stone-900;
+  }
+
+  .rich-text-content :where(h3) {
+    @apply text-base font-semibold text-stone-900;
+  }
+
+  .rich-text-content :where(h4, h5, h6) {
+    @apply text-sm font-semibold text-stone-900;
+  }
+
+  .rich-text-content :where(blockquote) {
+    @apply border-l-4 border-stone-300 pl-4 italic text-stone-600;
+  }
+
+  .rich-text-content :where(pre, code) {
+    @apply rounded bg-stone-100 px-1 py-0.5 text-xs text-stone-800;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  .search-highlight {
+    @apply rounded bg-amber-200 px-0.5 font-semibold text-stone-900;
+  }
+
+  .form-dialog-overlay {
+    @apply fixed inset-0 z-[70] flex items-center justify-center overflow-y-auto bg-stone-900/40 p-4;
+  }
+
+  .form-dialog-panel {
+    @apply my-auto flex w-full flex-col overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-xl;
+    max-height: 90vh;
+  }
+
+  .form-dialog-panel-wide {
+    @apply max-w-7xl;
+  }
+
+  .form-dialog-panel-medium {
+    @apply max-w-4xl;
+  }
+
+  .form-dialog-panel-narrow {
+    @apply max-w-lg;
+  }
+
+  .form-dialog-header {
+    @apply flex shrink-0 items-start justify-between gap-3 px-6 pt-5 sm:px-8 sm:pt-6;
+  }
+
+  .form-dialog-body {
+    @apply min-h-0 flex-1 overflow-y-auto px-6 sm:px-8;
+  }
+
+  .form-dialog-body-inner {
+    @apply py-3 sm:py-4;
+  }
+
+  .form-dialog-footer {
+    @apply flex shrink-0 justify-end gap-3 bg-white px-6 py-3 sm:px-8;
+  }
+
+  .form-dialog-context {
+    @apply mb-3 rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-sm text-stone-700;
+  }
+
+  @media (min-width: 1024px) {
+    .form-dialog-panel {
+      max-height: none;
+    }
+
+    .form-dialog-body {
+      overflow-y: visible;
+    }
   }
 }

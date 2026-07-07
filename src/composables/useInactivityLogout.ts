@@ -1,36 +1,36 @@
 import { onBeforeUnmount, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { DEFAULT_SECURITY_SETTINGS, subscribeSecuritySettings, type SecuritySettings } from '@/lib/appSettings'
 import { useAuthStore } from '@/stores/auth'
 
 const ACTIVITY_EVENTS = ['click', 'mousemove', 'keydown', 'scroll', 'touchstart'] as const
-const AUTO_LOGOUT_MS = 15 * 60 * 1000
 
 export function useInactivityLogout() {
   const auth = useAuthStore()
   const router = useRouter()
 
   let timeoutId: number | null = null
+  let unsubscribeSettings: (() => void) | null = null
+  let settings: SecuritySettings = { ...DEFAULT_SECURITY_SETTINGS }
   let listening = false
 
-  function clearTimer() {
-    if (timeoutId !== null) {
-      window.clearTimeout(timeoutId)
-      timeoutId = null
-    }
+  function start() {
+    if (unsubscribeSettings) return
+
+    unsubscribeSettings = subscribeSecuritySettings((nextSettings) => {
+      settings = nextSettings
+      restartTimer()
+    })
+
+    addActivityListeners()
+    restartTimer()
   }
 
-  async function onTimeout() {
-    if (!auth.isAuthenticated) return
-    await auth.logout()
-    await router.push({ name: 'login' })
-  }
-
-  function restartTimer() {
+  function stop() {
     clearTimer()
-    if (!auth.isAuthenticated) return
-    timeoutId = window.setTimeout(() => {
-      void onTimeout()
-    }, AUTO_LOGOUT_MS)
+    removeActivityListeners()
+    unsubscribeSettings?.()
+    unsubscribeSettings = null
   }
 
   function addActivityListeners() {
@@ -49,22 +49,34 @@ export function useInactivityLogout() {
     listening = false
   }
 
-  watch(
+  function restartTimer() {
+    clearTimer()
+
+    if (!auth.isAuthenticated || settings.autoLogoutMinutes <= 0) return
+
+    timeoutId = window.setTimeout(async () => {
+      await auth.logout()
+      await router.replace({ name: 'login', query: { reason: 'inactive' } })
+    }, settings.autoLogoutMinutes * 60 * 1000)
+  }
+
+  function clearTimer() {
+    if (!timeoutId) return
+    window.clearTimeout(timeoutId)
+    timeoutId = null
+  }
+
+  const stopWatch = watch(
     () => auth.isAuthenticated,
     (isAuthenticated) => {
-      if (isAuthenticated) {
-        addActivityListeners()
-        restartTimer()
-      } else {
-        clearTimer()
-        removeActivityListeners()
-      }
+      if (isAuthenticated) start()
+      else stop()
     },
     { immediate: true },
   )
 
   onBeforeUnmount(() => {
-    clearTimer()
-    removeActivityListeners()
+    stopWatch()
+    stop()
   })
 }

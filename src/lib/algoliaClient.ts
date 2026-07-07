@@ -12,7 +12,7 @@ export function getAlgoliaClient(): SearchClient {
     const appId = import.meta.env.VITE_ALGOLIA_APP_ID
     const searchKey = import.meta.env.VITE_ALGOLIA_SEARCH_KEY
     if (!appId || !searchKey) {
-      throw new Error('Algolia is niet geconfigureerd. Vul VITE_ALGOLIA_* in .env in.')
+      throw new Error('Algolia is not configured. Set VITE_ALGOLIA_* in .env.')
     }
     client = algoliasearch(appId, searchKey)
   }
